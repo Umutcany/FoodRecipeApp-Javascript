@@ -2,6 +2,10 @@ const mealsEl=document.getElementById("meals");
 const favoriteContainer =document.getElementById("favorite-meals")
 const searchTerm=document.getElementById("search-term")
 const searchBtn = document.getElementById("search")
+const mealPopup= document.getElementById("meal-popup")
+const popupCloseBtn = document.getElementById("close-popup")
+const mealInfoEl =document.getElementById("meal-info")
+
 
 getRandomMeal()
 fetchFavMeals()
@@ -37,9 +41,6 @@ async function getRandomMeal() {
                 
                 const respData=await resp.json()
                 const meals = respData.meals
-
-
-                console.log(meals)
 
                 return meals;
 
@@ -82,9 +83,63 @@ function addMeal(mealData, random=false) {
         fetchFavMeals()
     })
 
+    meal.addEventListener("click", () => {
+
+        showMealInfo(mealData);
+
+    })
+
     mealsEl.appendChild(meal)
 
 }
+
+function showMealInfo(mealData) {
+
+    // update the Meal info
+    const mealEl = document.createElement("div");
+
+    const ingredients = [];
+
+    // get ingredients and measures
+    for (let i = 1; i <= 20; i++) {
+        if (mealData["strIngredient" + i]) {
+            ingredients.push(
+                `${mealData["strIngredient" + i]} - ${
+                    mealData["strMeasure" + i]
+                }`
+            );
+        } else {
+            break;
+        }
+    }
+
+    mealEl.innerHTML = `
+        <h1>${mealData.strMeal}</h1>
+        <img
+            src="${mealData.strMealThumb}"
+            alt="${mealData.strMeal}"
+        />
+        <p>
+        ${mealData.strInstructions}
+        </p>
+        <h3>Ingredients:</h3>
+        <ul>
+            ${ingredients
+                .map(
+                    (ing) => `
+            <li>${ing}</li>
+            `
+                )
+                .join("")}
+        </ul>
+    `;
+
+    mealInfoEl.appendChild(mealEl);
+
+    // show the popup
+    mealPopup.classList.remove("hidden");
+}
+
 
 function addMealLS(mealId) {
     const mealIds = getMealsLS();
@@ -121,31 +176,33 @@ async function fetchFavMeals() {
         addMealFav(meal)
     }
 
+
 }
 
-
 function addMealFav(mealData) {
+    const favMeal = document.createElement("li");
 
-  
-    const favMeal=document.createElement("li")
+    favMeal.innerHTML = `
+        <img
+            src="${mealData.strMealThumb}"
+            alt="${mealData.strMeal}"
+        /><span>${mealData.strMeal}</span>
+        <button class="clear"><i class="fas fa-window-close"></i></button>
+    `;
 
-    favMeal.innerHTML=`
-      <img
-       src="${mealData.strMealThumb}" alt="${mealData.strMeal}">
-       <span>${mealData.strMeal}</span>
-       <button class="clear"><i class="fa-sharp fa-regular fa-circle-xmark"></i></button>`
+    const btn = favMeal.querySelector(".clear");
 
-       const btn=favMeal.querySelector(".clear");
-       btn.addEventListener("click", () => {
-
+    btn.addEventListener("click", () => {
         removeMealLS(mealData.idMeal);
 
-        fetchFavMeals()
+        fetchFavMeals();
+    });
 
-       })
+    favMeal.addEventListener("click", () => {
+        showMealInfo(mealData);
+    });
 
-    favoriteContainer.appendChild(favMeal)
-
+    favoriteContainer.appendChild(favMeal);
 }
 
 searchBtn.addEventListener("click", async () => {
@@ -162,5 +219,12 @@ searchBtn.addEventListener("click", async () => {
             addMeal(meal);     
         }) 
     }
+
+})
+
+popupCloseBtn.addEventListener("click", () => {
+
+    mealPopup.classList.add("hidden")
+
 })
 
