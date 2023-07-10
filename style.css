@@ -68,8 +68,9 @@ img{
 }
 
 .favorite-meals li {
-
-    width: 85px;
+    position: relative;
+    width: 75px;
+    margin: 5px;
 }
 
 
@@ -83,8 +84,29 @@ img{
 }
 
 
+.favorite-meals li .clear  {
+    margin-top: 3px;
+    background-color: transparent;
+    position: absolute;
+    top: -0.6rem;
+    right: -0.6rem;
+    border: none;
+    font-size: 1.2rem;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.favorite-meals li:hover .clear {
+    opacity: 1;
+}
+
 .favorite-meals li span {
     font-size: 0.9rem;
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 75px;
 }
 
 .meal {
